@@ -61,7 +61,7 @@ This document specifies algorithm identifiers, public key structures, and signat
 
 --- middle
 
-## Introduction
+# Introduction
 
 The Fast-Fourier Transform over NTRU-Lattice-Based Digital Signature Algorithm (FN-DSA) [FIPS206], formerly known as Falcon, is a post-quantum signature scheme standardized by the U.S. National Institute of Standards and Technology (NIST). The conventions for using standalone FN-DSA in X.509 certificates are specified in [I-D.turner-lamps-fn-dsa-certificates].
 
@@ -72,7 +72,7 @@ To support interoperable deployment in existing public key infrastructures, this
 To enable interoperable use of these algorithms in X.509 certificates and CRLs [RFC5280], this document specifies the encodings for composite public keys and signatures, assigns Object Identifiers (OIDs) to the composite algorithms, and defines the associated PKI conventions.
 
 
-## Terminology
+# Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174].
 
 Readers are expected to be familiar with the terms and concepts described in X.509 [RFC5280] and FN-DSA [FIPS206]. This document follows the terminology for post-quantum/traditional (PQ/T) hybrid schemes defined in [RFC9794] and uses the following terms:
@@ -84,7 +84,7 @@ Readers are expected to be familiar with the terms and concepts described in X.5
 - **Classical Security Strength:** An estimate, expressed in bits, of the computational effort required to break a cryptographic algorithm using classical computing resources.
 
 
-## Algorithm Identifiers and Parameters
+# Algorithm Identifiers and Parameters
 
 Each composite signature algorithm defined in this document is identified by a distinct Object Identifier (OID). These OIDs are used in the algorithm field of the AlgorithmIdentifier structure defined in [RFC5280]:
 
@@ -118,8 +118,27 @@ The following algorithms and parameters are defined:
     - Traditional algorithm: Ed25519
 	    - Traditional signature algorithm: id-Ed25519
 
-- **id-fndsa512-rsa3072-pss-sha256**
+- **id-fndsa512-rsa2048-pss-sha256**
     - OID: TBD3
+    - Label: COMPSIG-FNDSA512-RSA2048-PSS-SHA256
+    - Pre-hash function (PH): SHA256
+    - FN-DSA parameter set: FN-DSA-512
+    - Traditional Algorithm: RSA
+	    - Traditional signature algorithm: id-RSASSA-PSS
+	    - RSA size: 2048
+	    - RSASSA-PSS parameters: See Table 2
+     
+- **id-fndsa512-rsa2048-pkcs15-sha256**
+    - OID: TBD4
+    - Label: COMPSIG-FNDSA512-RSA2048-PKCS15-SHA256
+    - Pre-hash function (PH): SHA256
+    - FN-DSA parameter set: FN-DSA-512
+    - Traditional Algorithm: RSA
+	    - Traditional signature algorithm: sha256WithRSAEncryption
+	    - RSA size: 2048
+
+- **id-fndsa512-rsa3072-pss-sha256**
+    - OID: TBD5
     - Label: COMPSIG-FNDSA512-RSA3072-PSS-SHA256
     - Pre-hash function (PH): SHA256
     - FN-DSA parameter set: FN-DSA-512
@@ -128,8 +147,26 @@ The following algorithms and parameters are defined:
 	    - RSA size: 3072
 	    - RSASSA-PSS parameters: See Table 2
 
+- **id-fndsa1024-ecdsa-p384-sha512**
+    - OID: TBD6
+    - Label: COMPSIG-FNDSA1024-ECDSA-P384-SHA512
+    - Pre-hash function (PH): SHA-512
+    - FN-DSA parameter set: FN-DSA-1024
+    - Traditional Algorithm: ECDSA
+	    - Traditional Signature Algorithm: ecdsa-with-SHA384
+	    - ECDSA curve: secp384r1
+     
+- **id-fndsa1024-ecdsa-brainpoolP384r1-sha512**
+    - OID: TBD7
+    - Label: COMPSIG-FNDSA1024-ECDSA-BRAINPOOLP384R1-SHA512
+    - Pre-hash function (PH): SHA-512
+    - FN-DSA parameter set: FN-DSA-1024
+    - Traditional Algorithm: ECDSA
+	    - Traditional Signature Algorithm: ecdsa-with-SHA384
+	    - ECDSA curve: brainpoolP384r1
+
 - **id-fndsa1024-ecdsa-p521-sha512**
-    - OID: TBD4
+    - OID: TBD8
     - Label: COMPSIG-FNDSA1024-ECDSA-P521-SHA512
     - Pre-hash function (PH): SHA-512
     - FN-DSA parameter set: FN-DSA-1024
@@ -138,42 +175,61 @@ The following algorithms and parameters are defined:
 	    - ECDSA curve: secp521r1
 
 - **id-fndsa1024-ed448-sha512**
-    - OID: TBD5
+    - OID: TBD9
     - Label: COMPSIG-FNDSA1024-Ed448-SHA512
     - Pre-hash function (PH): SHA-512
     - FN-DSA parameter set: FN-DSA-1024
     - Traditional Algorithm: Ed448
 	    - Traditional signature algorithm: Ed448
+     
+- **id-fndsa1024-rsa3072-pss-sha512**
+    - OID: TBD10
+    - Label: COMPSIG-FNDSA1024-RSA3072-PSS-SHA512
+    - Pre-hash function (PH): SHA512
+    - FN-DSA parameter set: FN-DSA-1024
+    - Traditional Algorithm: RSA
+	    - Traditional signature algorithm: id-RSASSA-PSS
+	    - RSA size: 3072
+	    - RSASSA-PSS parameters: See Table 2
+     
+- **id-fndsa1024-rsa3072-pkcs15-sha512**
+    - OID: TBD11
+    - Label: COMPSIG-FNDSA1024-RSA3072-PKCS15-SHA512
+    - Pre-hash function (PH): SHA512
+    - FN-DSA parameter set: FN-DSA-1024
+    - Traditional Algorithm: RSA
+	    - Traditional signature algorithm: sha384WithRSAEncryption
+	    - RSA size: 3072
 
 Each Label is the ASCII encoding of the exact string listed above, without a terminating NUL octet.
 
 The Ed25519 and Ed448 components MUST use the pure variants defined in [RFC8032]. Ed25519ph, Ed25519ctx, and Ed448ph MUST NOT be used. The Ed448 component MUST use an empty context string.
 
-The RSASSA-PSS component requires additional parameters as defined in [RFC8017]. For id-fndsa512-rsa3072-pss-sha256, these parameters MUST have the following values:
+The RSASSA-PSS component requires additional parameters as defined in [RFC8017]. For RSASSA-PSS, these parameters MUST have the following values:
 
 |RSASSA-PSS-params field|Value|
 |---|---|
-|hashAlgorithm|id-sha256|
-|maskGenAlgorithm.algorithm|id-mgf1|
-|maskGenAlgorithm.parameters|AlgorithmIdentifier identifying SHA-256|
-|saltLength|32|
-|trailerField|1|
+|`hashAlgorithm`|`id-sha256`|
+|`maskGenAlgorithm.algorithm`|`id-mgf1`|
+|`maskGenAlgorithm.parameters`|`AlgorithmIdentifier` identifying SHA-256|
+|`saltLength`|32 octets|
+|`trailerField`|1|
 
 Table 2: RSASSA-PSS 2048 and 3072 Parameters
 
 The `parameters` field of `AlgorithmIdentifier` MUST be absent for all composite algorithm identifiers defined in this section. It MUST NOT contain an ASN.1 `NULL` value. This requirement also applies to composites using RSASSA-PSS: the RSASSA-PSS parameters are fixed by the composite algorithm identifier, and no `RSASSA-PSS-params` structure is carried in the `parameters` field.
 
-The OID values are pending assignment. TBD1 through TBD5 are editorial placeholders and are not valid OID values.
+The OID values are pending assignment. TBD1 through TBD11 are editorial placeholders and are not valid OID values.
 
 
 
-## Composite FN-DSA Signature Scheme
+# Composite FN-DSA Signature Scheme
 
 This section specifies the serialization and deserialization of composite keys and signature values, together with the key generation, signature generation, and signature verification operations.
 
 Each operation is instantiated for a composite algorithm identifier defined in Section 3. The identifier determines the FN-DSA parameter set, the traditional signature algorithm and its parameters, the composite-layer pre-hash function PH, and the domain-separation Label. These values are fixed for that identifier and are not independently selectable by the caller.
 
-### Serialization and Deserialization
+## Serialization and Deserialization
 
 The functions in this section convert component keys and signatures to and from composite octet strings. Each function is instantiated for a composite algorithm identifier defined in Section 3, which determines the component algorithms, parameters, and encodings.
 
@@ -181,7 +237,7 @@ Deserialization returns ERROR if the input is malformed or does not conform to t
 
 > EDITOR'S NOTE: The FN-DSA seed length, encoding, and key reconstruction procedure are to be confirmed against the finalized [FIPS206]. This note is to be removed when those dependencies are resolved.
 
-#### Public Keys
+### Public Keys
 
 The public-key serialization and deserialization functions are:
 
@@ -220,7 +276,7 @@ pk_trad  = pk[L:]
 
 The input MUST contain both components. Each component MUST have the required encoding and satisfy the public-key validation requirements of the selected algorithm. 
 
-#### Private Keys
+### Private Keys
 
 The private-key serialization and deserialization functions are:
 
@@ -259,7 +315,7 @@ sk_trad    = sk[32:]
 
 The traditional component MUST have the required encoding and satisfy the private-key validation requirements of the selected algorithm. 
 
-#### Signature Values
+### Signature Values
 
 The signature serialization and deserialization functions are:
 
@@ -297,7 +353,7 @@ Each resulting component MUST have the required encoding. Fixed-length tradition
 
 Successful deserialization does not establish signature validity.
 
-### Key Generation
+## Key Generation
 
 The `KeyGen()` function for a given Composite FN-DSA algorithm represented by `OID` is defined as:
 
@@ -318,7 +374,7 @@ The operation proceeds as follows:
 	```
 4. Return `(pk, sk)`. If either component key generation or serialization fails, return `ERROR` and do not return a partial composite key pair.
 
-### Signature Generation
+## Signature Generation
 The composite signature-generation operation accepts a message `M`, a composite private key `sk`, and an optional context string `ctx`. If no context is supplied, `ctx` is the empty octet string.
 
 The `Sign()` function for a given Composite FN-DSA algorithm represented by `OID` is defined as:
@@ -363,7 +419,7 @@ The component signing operations receive the complete `M'`. The composite-layer 
 
 All randomness required by component signature generation MUST be generated and used according to the respective component specifications. Random values, including signature nonces and salts, MUST NOT be reused across component algorithms.
 
-### Signature Verification
+## Signature Verification
 
 The composite signature-verification operation accepts a message `M`, a composite public key `pk`, a composite signature `sig`, and an optional context string `ctx`. If no context is supplied, `ctx` is the empty octet string.
 
@@ -399,26 +455,26 @@ The operation proceeds as follows:
 An implementation MAY return `INVALID` as soon as a failure is established, without performing the remaining operations.
 
 
-## PKIX Profile 
+# PKIX Profile 
 
 This section provides a profile for the use of composite FN-DSA signature algorithms in the Internet X.509 PKI [RFC5280]. Composite FN-DSA is treated as a single signature algorithm in PKIX, using composite certificates as specified in [I-D.ietf-lamps-pq-composite-sigs].
 
-### Certificate `signatureAlgorithm` Field
+## Certificate `signatureAlgorithm` Field
 The `signatureAlgorithm` field in a certificate that is signed with a composite algorithm MUST contain the OID of the composite algorithm used. The tbsCertificate.signature field MUST contain the same AlgorithmIdentifier as the signatureAlgorithm field, as required by [RFC5280].
 
-### Subject Public Key Info
+## Subject Public Key Info
 The `subjectPublicKeyInfo` field in a certificate containing a composite public key MUST be populated as follows:
 *   The `algorithm` field MUST contain the OID of the corresponding composite algorithm, and the parameters field MUST be absent.
 *   The `subjectPublicKey` field MUST contain the `BIT STRING` representation of the `CompositePublicKey` as defined in Section 4.1, , without additional ASN.1 encoding.
 
-### Key Usage
+## Key Usage
 The `keyUsage` extension in a certificate containing a composite public key SHOULD be marked as `critical`. The `digitalSignature` and/or `nonRepudiation` bits MUST be set. If the key is used to sign certificates, the `keyCertSign` bit MUST be set. If it is used to sign CRLs, the `cRLSign` bit MUST be set.
 
 
-## IANA Considerations
+# IANA Considerations
 This document requests the assignment of five Object Identifiers from a suitable OID arc for the composite signature algorithms defined in Section 3. These OIDs identify the new signature algorithms and are intended for use in X.509 certificates and other cryptographic protocols.
 
-## Security Considerations
+# Security Considerations
 The primary security goal of this specification is to provide **hybrid security**. A composite signature's security is intended to be at least as high as the security of its strongest component. An attacker must break *both* the FN-DSA component and the classical component to forge a composite signature.
 
 **Domain Separation**: The domain separation mechanism described in Section 4.3 is critical. It ensures that a signature component created for this composite scheme cannot be misinterpreted as a valid standalone signature in another context. Implementers MUST follow the message preparation steps exactly.
