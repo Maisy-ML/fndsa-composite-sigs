@@ -214,8 +214,7 @@ The RSASSA-PSS component requires additional parameters as defined in [RFC8017].
 |`maskGenAlgorithm.parameters`|`AlgorithmIdentifier` identifying SHA-256|
 |`saltLength`|32 octets|
 |`trailerField`|1|
-
-Table 2: RSASSA-PSS 2048 and 3072 Parameters
+{: #tbl-mapping title="RSASSA-PSS 2048 and 3072 Parameters"}
 
 The `parameters` field of `AlgorithmIdentifier` MUST be absent for all composite algorithm identifiers defined in this section. It MUST NOT contain an ASN.1 `NULL` value. This requirement also applies to composites using RSASSA-PSS: the RSASSA-PSS parameters are fixed by the composite algorithm identifier, and no `RSASSA-PSS-params` structure is carried in the `parameters` field.
 
