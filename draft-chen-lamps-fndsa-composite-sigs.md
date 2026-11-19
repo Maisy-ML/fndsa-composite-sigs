@@ -405,7 +405,7 @@ The operation proceeds as follows:
 3. Reconstruct the FN-DSA signing key `sk_fndsa` from `seed_fndsa`.
 4. Generate the two component signatures independently over the same `M'` according to their algorithm specifications:
     ```
-    sig_fndsa = FNDSA.Sign(sk_fndsa, M', fndsa_ctx="")
+    sig_fndsa = FNDSA.Sign(sk_fndsa, M', fndsa_ctx="Label")
     sig_trad = Trad.Sign(sk_trad, M')
     ```
 5. Serialize the component signatures:
